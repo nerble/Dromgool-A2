@@ -28,10 +28,10 @@ A2_dromgoolAudioProcessor::A2_dromgoolAudioProcessor()
 {
     // initialise some variables
     
-    float currentSampleRate = 0.0f;
-    float currentAngle      = 0.0f;
-    float angleDelta        = 0.0f;
-    float sinFreq           = 0.0f;
+    float currentSampleRate     = 0.0f;
+    float currentAngle          = 0.0f;
+    float angleDelta            = 0.0f;
+    float sinFreq               = 0.0f;
 
 }
 
