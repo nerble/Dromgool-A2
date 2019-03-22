@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="M8bwsB" name="A2-Dromgool" projectType="audioplug" jucerVersion="5.4.3"
-              pluginFormats="buildAU,buildStandalone,buildVST3" cppLanguageStandard="latest">
+              pluginFormats="buildStandalone,buildVST3" cppLanguageStandard="17">
   <MAINGROUP id="oWQcCq" name="A2-Dromgool">
     <GROUP id="{6483FCB1-F606-77DC-2380-BA3346ABEE69}" name="Source">
       <FILE id="knOYmF" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -19,7 +19,7 @@
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" vst3BinaryLocation="/Users/barnabydromgool/projects/A2_Dromgool/Builds/MacOSX/build/Debug/"
                        auBinaryLocation="/Users/barnabydromgool/projects/A2_Dromgool/Builds/MacOSX/build/Debug/"
-                       enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
+                       enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION isDebug="0" name="Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

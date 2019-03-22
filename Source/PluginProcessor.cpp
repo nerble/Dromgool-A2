@@ -13,6 +13,13 @@
 #include <math.h>
 #include <complex.h>
 
+// initialise some global variables
+
+float currentSampleRate     = 0.0f;
+float currentAngle          = 0.0f;
+float angleDelta            = 0.0f;
+float sinFreq               = 0.0f;
+
 //==============================================================================
 A2_dromgoolAudioProcessor::A2_dromgoolAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -24,14 +31,9 @@ A2_dromgoolAudioProcessor::A2_dromgoolAudioProcessor()
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
                        )
+
 #endif
 {
-    // initialise some variables
-    
-    float currentSampleRate     = 0.0f;
-    float currentAngle          = 0.0f;
-    float angleDelta            = 0.0f;
-    float sinFreq               = 0.0f;
 
 }
 
