@@ -13,12 +13,7 @@
 #include <math.h>
 #include <complex.h>
 
-// initialise some global variables
 
-float currentSampleRate     = 0.0f;
-float currentAngle          = 0.0f;
-float angleDelta            = 0.0f;
-float sinFreq               = 0.0f;
 
 //==============================================================================
 A2_dromgoolAudioProcessor::A2_dromgoolAudioProcessor()
@@ -34,6 +29,12 @@ A2_dromgoolAudioProcessor::A2_dromgoolAudioProcessor()
 
 #endif
 {
+    // initialise some global variables
+    
+    currentSampleRate     = 0.0f;
+    currentAngle          = 0.0f;
+    angleDelta            = 0.0f;
+    sinFreq               = 0.0f;
 
 }
 
@@ -108,8 +109,13 @@ void A2_dromgoolAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Pre-playback initialisation
     currentSampleRate = sampleRate;
-    sinFreq = 8.0f; // Meaning a "heard" modulation of 16Hz
+    sinFreq = 300.0f;
     updateAngleDelta();
+    mixLevel.reset(currentSampleRate,0.02f); // second part is ramp up in seconds
+    mixLevel.setTargetValue(0.9f);
+    //mixLevel = 0.9f;
+    
+    //gain.setGainDecibels(0.0f);
     
     String message;
     message << "Preparing to play..." << newLine;
@@ -180,10 +186,14 @@ void A2_dromgoolAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
             // Calculate value to use to modulate values in wet buffer
+            if (sinFreq != sinFreqLast)
+            {
+                updateAngleDelta();
+            }
             auto currentSinSample = (float) std::sin(currentAngle);
             currentAngle += angleDelta;
-            
             // Modulate wetData sample value with sine wave sample value
+            //wetData[sample] = wetData[sample] * currentSinSample;
             wetData[sample] = wetData[sample] * currentSinSample;
             
             // Gain staging and output.  Creating new sample value in channelData
@@ -195,9 +205,19 @@ void A2_dromgoolAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
             // interesting transformations for sci-fi, avant garde, and electronica-type
             // sounds
             
-            channelData[sample] = wetData[sample] * 0.6f + channelData[sample] * 0.4f;
+            //channelData[sample] = wetData[sample] * 0.6f + channelData[sample] * 0.4f;
+            
+            channelData[sample] = channelData[sample] * (1.0f - mixLevel.getNextValue()) +
+                wetData[sample] * mixLevel.getNextValue();
+            //channelData[sample] = channelData[sample] * (1.0f - mixLevel) +
+              //  wetData[sample] * mixLevel;
+            // could also have a slider just to control overall mix level
+            //channelData[sample] = wetData[sample] * mixLevel;
+            sinFreqLast = sinFreq;
         }
     }
+    //dsp::AudioBlock<float> output(buffer);
+    //gain.process(dsp::ProcessContextReplacing<float> (output));
 }
 
 //==============================================================================
@@ -231,6 +251,7 @@ void A2_dromgoolAudioProcessor::setStateInformation (const void* data, int sizeI
 void A2_dromgoolAudioProcessor::updateAngleDelta()
 {
     // Calculate number of cycles that we will need to complete for each output sample
+    // auto cyclesPerSample = sinFreq / currentSampleRate;
     auto cyclesPerSample = sinFreq / currentSampleRate;
     // multiply this by the length of the whole sine wave cycle
     angleDelta = cyclesPerSample * MathConstants<float>::twoPi;
