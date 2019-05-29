@@ -1,15 +1,9 @@
-Clear description of what your audio plugin
-• Key features
-• Demo screenshot of GUI
-• Simple install/usage instructions
-• Links to media assets such as video, or audio
-• Appropriate referencing for DSP techniques and algorithms
-• Links to further reading 
 
 # Noisifier
-![screenshot](https://github.com/nerble/Dromgool-A2/blob/master/markdown-files/noisifier.png)
+<img src="https://github.com/nerble/Dromgool-A2/blob/master/markdown-files/noisifier.png" 
+alt="Noisifier VST"/>
 
-Noisifier is a simple, freeware, open-source VST3 audio plugin developed in C++ using the [JUCE](https://juce.com/) framework.  It provides an easy way to transform audio signals using single-slider controls for ring modulation, bit crushing, and foldback distortion.
+Noisifier is a simple, freeware, open-source VST3 audio plugin developed in C++ using the [JUCE](https://juce.com/) framework.  It provides an easy way to transform (read: obliterate) audio signals using single-slider controls for  (chained) ring modulation, bit crushing, and foldback distortion effects.
 
 ## Key features
 
@@ -22,21 +16,37 @@ Noisifier is a simple, freeware, open-source VST3 audio plugin developed in C++ 
 
 ## Installation and usage
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
-
-```bash
-pip install foobar
-```
+If you want to compile from source, grab the source files from the [Source folder](https://github.com/nerble/Dromgool-A2/tree/master/Source), install [JUCE](https://juce.com/) for your OS and follow the usual build steps for your OS/architecture and IDE.
 
 ## Media
 
-```python
-import foobar
+Brief video demonstration of plugin
 
-foobar.pluralize('word') # returns 'words'
-foobar.pluralize('goose') # returns 'geese'
-foobar.singularize('phenomena') # returns 'phenomenon'
-```
+<a href="https://www.youtube.com/watch?v=at6CPTo6ZLU
+" target="_blank"><img src="https://img.youtube.com/vi/at6CPTo6ZLU/sddefault.jpg" 
+alt="Brief video demonstration of plugin" /></a>
+
+<br/>
+Example audio for ring modulation effect
+
+<a href="https://github.com/nerble/Dromgool-A2/blob/master/markdown-files/ringmod_demo.wav
+" target="_blank"><img src="https://github.com/nerble/Dromgool-A2/blob/master/markdown-files/audio_widget.png" 
+alt="Example audio for ring modulation effect" width="300"/></a>
+
+<br/>
+Example audio for bit crusher effect
+
+<a href="https://github.com/nerble/Dromgool-A2/blob/master/markdown-files/bitcrusher%20demo.wav
+" target="_blank"><img src="https://github.com/nerble/Dromgool-A2/blob/master/markdown-files/audio_widget.png" 
+alt="Example audio for ring modulation effect" width="300"/></a>
+
+<br/>
+Example audio for fold back distortion effect
+
+<a href="https://github.com/nerble/Dromgool-A2/blob/master/markdown-files/foldback%20demo.wav
+" target="_blank"><img src="https://github.com/nerble/Dromgool-A2/blob/master/markdown-files/audio_widget.png" 
+alt="Example audio for ring modulation effect" width="300"/></a>
+
 
 ## References
 
@@ -45,10 +55,18 @@ foobar.singularize('phenomena') # returns 'phenomenon'
 3. Fold back distortion algorithm based on [ed.bpu@eriflleh](mailto:ed.bpu@eriflleh)'s code [here](https://www.musicdsp.org/en/latest/Effects/203-fold-back-distortion.html).
 
 ## Contributing
-At this early point of development, feature-based pull requests are discouraged (though bug-fixes or DSP efficiency upgrades are definitely welcome). 
+At this early point of development, feature-based pull requests are discouraged (though bug-fixes or DSP efficiency upgrades are definitely welcome!)
 
 
 ## Further reading
+
+If you're interested in learning how to develop audio VSTs in C++ using the JUCE framework (and you should be!) I would strongly recommend the following resources:
+
+* TheChernoProject's [C++ tutorial series](https://www.youtube.com/watch?v=18c3MTX0PK0&list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb) on YouTube.
+
+* Juce.com's [tutorials](https://juce.com/learn/tutorials).
+
+* The Audio Programmer's [JUCE framework tutorial series](https://www.youtube.com/watch?v=7n16Yw51xkI&list=PLLgJJsrdwhPxa6-02-CeHW8ocwSwl2jnu) on YouTube.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
