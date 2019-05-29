@@ -3,6 +3,10 @@
 <JUCERPROJECT id="M8bwsB" name="A2-Dromgool" projectType="audioplug" jucerVersion="5.4.3"
               pluginFormats="buildVST3" cppLanguageStandard="17">
   <MAINGROUP id="oWQcCq" name="A2-Dromgool">
+    <GROUP id="{C85E5641-2485-5972-4CBA-4DDB4A08C30A}" name="Resources">
+      <FILE id="B8wc1l" name="transbut.png" compile="0" resource="1" file="../../Downloads/transbut.png"/>
+      <FILE id="jAzxcc" name="background.png" compile="0" resource="1" file="../../Downloads/background.png"/>
+    </GROUP>
     <GROUP id="{6483FCB1-F606-77DC-2380-BA3346ABEE69}" name="Source">
       <FILE id="knOYmF" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -17,10 +21,10 @@
     <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="../../sdks/VST_SDK/VST3_SDK"
                microphonePermissionNeeded="1">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" vst3BinaryLocation="/Users/barnabydromgool/projects/A2_Dromgool/Builds/MacOSX/build/Debug/"
+        <CONFIGURATION isDebug="0" name="Debug" vst3BinaryLocation="/Users/barnabydromgool/projects/A2_Dromgool/Builds/MacOSX/build/Debug/"
                        auBinaryLocation="/Users/barnabydromgool/projects/A2_Dromgool/Builds/MacOSX/build/Debug/"
                        enablePluginBinaryCopyStep="0"/>
-        <CONFIGURATION isDebug="0" name="Release"/>
+        <CONFIGURATION isDebug="1" name="Release" targetName="Noisifier"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../sdks/JUCE/modules"/>
@@ -58,7 +62,7 @@
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
   <LIVE_SETTINGS>
-    <OSX/>
+    <OSX buildEnabled="1"/>
   </LIVE_SETTINGS>
   <JUCEOPTIONS JUCE_VST3_CAN_REPLACE_VST2="0" JUCE_STRICT_REFCOUNTEDPOINTER="1"
                JUCE_PLUGINHOST_VST3="1" JUCE_PLUGINHOST_AU="1"/>

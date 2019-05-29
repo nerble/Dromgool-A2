@@ -25,17 +25,52 @@ A2_dromgoolAudioProcessor::A2_dromgoolAudioProcessor()
                       #endif
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), parameters(*this, nullptr, Identifier("A2-Dromgool"),
+                                {
+                                    // List of parameters for plugin
+                                    // params for buttons etc go here
+                                    // 'nullptr' above is where you would inform processor if you had an undo manager
+                                    std::make_unique<AudioParameterFloat>("mix", // parameter ID
+                                                                          "Mix", // parameter Name in DAW dropdown
+                                                                          0.0f, // min value
+                                                                          1.0f, // max value
+                                                                          0.5f // default value
+                                                                          ),
+                                    std::make_unique<AudioParameterFloat>("freq",
+                                                                        "Modder",
+                                                                        0.0f,
+                                                                        9000.0f,
+                                                                        0.0f
+                                                                        ),
+                                    std::make_unique<AudioParameterFloat>("bit",
+                                                                          "Crusher",
+                                                                          1,
+                                                                          16,
+                                                                          16
+                                                                          ),
+                                    std::make_unique<AudioParameterFloat>("dist",
+                                                                          "Squasher",
+                                                                          0.0f,
+                                                                          0.5f,
+                                                                          1.0f
+                                                                          )
+                                }
+                    )
 
 #endif
 {
     // initialise some global variables
+    mixParameter = parameters.getRawParameterValue("mix");
+    freqParameter = parameters.getRawParameterValue("freq");
+    bitParameter = parameters.getRawParameterValue("bit");
+    distParameter = parameters.getRawParameterValue("dist");
     
     currentSampleRate     = 0.0f;
     currentAngle          = 0.0f;
     angleDelta            = 0.0f;
-    sinFreq               = 0.0f;
-
+    sinFreq               = *freqParameter;
+    distLevel             = *distParameter;
+    bitLevel              = *bitParameter;
 }
 
 A2_dromgoolAudioProcessor::~A2_dromgoolAudioProcessor()
@@ -109,18 +144,18 @@ void A2_dromgoolAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Pre-playback initialisation
     currentSampleRate = sampleRate;
-    sinFreq = 300.0f;
+    sinFreq = *freqParameter;
+    distLevel = *distParameter;
+    bitLevel = *bitParameter;
+    mixLevel = *mixParameter;
     updateAngleDelta();
-    mixLevel.reset(currentSampleRate,0.02f); // second part is ramp up in seconds
-    mixLevel.setTargetValue(0.9f);
-    //mixLevel = 0.9f;
-    
-    //gain.setGainDecibels(0.0f);
     
     String message;
     message << "Preparing to play..." << newLine;
     message << "My sample rate is: " << currentSampleRate << newLine;
     message << "My sine wave frequency is " << sinFreq << "Hz" << newLine;
+    message << "My distortion level is " << distLevel << newLine;
+    message << "My bit depth is " << bitLevel << newLine;
     message << "Audio buffer size is " << samplesPerBlock << newLine;
     Logger::getCurrentLogger()->writeToLog(message);
 
@@ -174,8 +209,8 @@ void A2_dromgoolAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     
     // Main audio processing loop
     // 1. Go through each audio input channel that is available (usually 2 for stereo)
-    // 2. Modulate copied samples in wet buffer using our generated sine wave (ring modulation)
-    // 3. Output 60% wet/ 40% dry mix of data to audio outputs
+    // 2. Manipulate samples using effects (ring mod, bitcrusher, distortion)
+    // 3. Output mix of data to audio outputs
     
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
@@ -185,39 +220,60 @@ void A2_dromgoolAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
+            //
+            // Ring modulator processing
+            //
+            
             // Calculate value to use to modulate values in wet buffer
+            
             if (sinFreq != sinFreqLast)
             {
                 updateAngleDelta();
             }
             auto currentSinSample = (float) std::sin(currentAngle);
             currentAngle += angleDelta;
+            
+            
             // Modulate wetData sample value with sine wave sample value
-            //wetData[sample] = wetData[sample] * currentSinSample;
-            wetData[sample] = wetData[sample] * currentSinSample;
             
-            // Gain staging and output.  Creating new sample value in channelData
-            // By scaling down and summing the wetData (modulated) sample value
-            // and the channelData (input) sample value.
+            if (sinFreq > 0.0f)
+            {
+                wetData[sample] = wetData[sample] * currentSinSample;
+            }
             
-            // The 8Hz sine wave modulates the input such that it is heard as a strong 16Hz
-            // pulse.  This is quite an extreme effect, but could be useful to produce
-            // interesting transformations for sci-fi, avant garde, and electronica-type
-            // sounds
             
-            //channelData[sample] = wetData[sample] * 0.6f + channelData[sample] * 0.4f;
+            // Bitcrusher.  See: https://www.musicdsp.org/en/latest/Effects/124-decimator.html
+            //
             
-            channelData[sample] = channelData[sample] * (1.0f - mixLevel.getNextValue()) +
-                wetData[sample] * mixLevel.getNextValue();
-            //channelData[sample] = channelData[sample] * (1.0f - mixLevel) +
-              //  wetData[sample] * mixLevel;
-            // could also have a slider just to control overall mix level
-            //channelData[sample] = wetData[sample] * mixLevel;
+            if (bitLevel < 16)
+            {
+                float quantum = powf(2.0f, bitLevel);
+                auto shapedSample = floor(wetData[sample] * quantum) / quantum;
+                wetData[sample] = shapedSample;
+            }
+            
+            
+            //
+            // Fold-back distortion ("squasher") effect.  See: https://www.musicdsp.org/en/latest/Effects/203-fold-back-distortion.html
+            //
+            
+            if (distLevel < 1.0f && distLevel > 0.0f)
+            {
+                wetData[sample] = fabs(fabs(fmod(wetData[sample] - distLevel, distLevel*4)) - distLevel*2) - distLevel;
+                float scaleGain = jmap(distLevel, 2.0f, 0.0f); // scale amplitude up depending on how much you squash it.  With slider at far left basically it's hiss.
+                wetData[sample] = wetData[sample] + scaleGain;
+            }
+            
+            
+            //
+            // Wet/Dry mix
+            //
+            
+            channelData[sample] =  channelData[sample] * (1.0f - mixLevel) + wetData[sample] * mixLevel;
+            
             sinFreqLast = sinFreq;
         }
     }
-    //dsp::AudioBlock<float> output(buffer);
-    //gain.process(dsp::ProcessContextReplacing<float> (output));
 }
 
 //==============================================================================
@@ -228,7 +284,7 @@ bool A2_dromgoolAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* A2_dromgoolAudioProcessor::createEditor()
 {
-    return new A2_dromgoolAudioProcessorEditor (*this);
+    return new A2_dromgoolAudioProcessorEditor (*this, parameters);
 }
 
 //==============================================================================
@@ -237,22 +293,38 @@ void A2_dromgoolAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    
+    // Copy current state of valuetree
+    
+    auto state = parameters.copyState();
+    std::unique_ptr<XmlElement> xml (state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void A2_dromgoolAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    
+    std::unique_ptr<XmlElement> xmlState (getXmlFromBinary(data, sizeInBytes));
+    
+    if (xmlState.get() != nullptr)
+    {
+        if (xmlState->hasTagName(parameters.state.getType()))
+        {
+            parameters.replaceState(ValueTree::fromXml(*xmlState));
+        }
+    }
 }
-
 //==============================================================================
 // User functions
 
 void A2_dromgoolAudioProcessor::updateAngleDelta()
 {
     // Calculate number of cycles that we will need to complete for each output sample
-    // auto cyclesPerSample = sinFreq / currentSampleRate;
+    
     auto cyclesPerSample = sinFreq / currentSampleRate;
+    
     // multiply this by the length of the whole sine wave cycle
     angleDelta = cyclesPerSample * MathConstants<float>::twoPi;
 }
@@ -263,3 +335,4 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new A2_dromgoolAudioProcessor();
 }
+
