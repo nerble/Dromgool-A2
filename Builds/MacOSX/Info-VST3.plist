@@ -10,11 +10,11 @@
     <key>CFBundleIconFile</key>
     <string></string>
     <key>CFBundleIdentifier</key>
-    <string>com.yourcompany.A2Dromgool</string>
+    <string>com.yourcompany.Noisifier</string>
     <key>CFBundleName</key>
-    <string>A2-Dromgool</string>
+    <string>Noisifier</string>
     <key>CFBundleDisplayName</key>
-    <string>A2-Dromgool</string>
+    <string>Noisifier</string>
     <key>CFBundlePackageType</key>
     <string>BNDL</string>
     <key>CFBundleSignature</key>
