@@ -18,7 +18,7 @@ Noisifier is a simple, freeware, open-source VST3 audio plugin developed in C++ 
 
 For Macs, you can just use the pre-built package installer [here](https://github.com/nerble/Dromgool-A2/blob/master/Noisifier/build/Noisifier.pkg).
 
-If you want to compile from source, create a non-VST3 or standalone version, or compile for other platforms, grab the source files from the [Source folder](https://github.com/nerble/Dromgool-A2/tree/master/Source), install [JUCE](https://juce.com/) for your OS and follow the usual build steps for your OS/architecture and IDE.
+If you want to compile from source, create a non-VST3 or standalone version, or compile for other platforms, grab the source files from the [Source folder](https://github.com/nerble/Dromgool-A2/tree/master/Source), install [JUCE](https://juce.com/) for your OS and follow the usual build steps for your OS/architecture and IDE (you should be able to figure out your includes from the contents of [this folder](https://github.com/nerble/Dromgool-A2/tree/master/JuceLibraryCode)).
 
 ## Media
 
